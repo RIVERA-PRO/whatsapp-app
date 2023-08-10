@@ -23,14 +23,23 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useIsFocused } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons'
+import { Feather } from '@expo/vector-icons';
 import { Octicons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import SeguridadChat from './SeguridadChat';
+import SituacionChat from './SituacionChat';
+import IconosChat from './IconosChat';
+import BloquearRepor from './BloquearRepor';
+import Notificaciones from './Notificaciones';
+import Multimedia from './Multimedia';
 export default function AllChats() {
     const isFocused = useIsFocused();
     const [chats, setChats] = useState([]);
     const navigation = useNavigation();
+    const [imageModalSelectedImage, setImageModalSelectedImage] = useState('');
 
     const [editModalVisible, setEditModalVisible] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
     const [editNumero, setEditNumero] = useState('');
     const [editChat, setEditChat] = useState('');
     const [editChatId, setEditChatId] = useState('');
@@ -64,18 +73,22 @@ export default function AllChats() {
         }
     };
 
-    const openEditModal = (id, numero, chat, chat1, chat2, num, estate, image) => {
+
+    const openEditModal = (id, numero, chat, chat1, chat2, num, estate, imagen) => {
         setEditModalVisible(true);
         setEditNumero(numero);
         setEditChat(chat);
         setEditChat1(chat1);
         setEditChat2(chat2);
         setEditNum(num);
-        setEditEstate(estate)
-        setEditImg(image)
+        setEditEstate(estate);
+        setEditImg(imagen);
         setEditChatId(id);
-    };
+        console.log("Image URL:", imagen);
+        // Set the selected image for the edit modal
+        setSelectedImage(imagen);
 
+    };
 
     const saveEdit = async () => {
         try {
@@ -126,18 +139,6 @@ export default function AllChats() {
         }
     };
 
-    const deleteAllChats = async () => {
-        try {
-            await AsyncStorage.removeItem('chats');
-            setChats([]);
-        } catch (error) {
-            console.log('Error deleting all chats:', error);
-        }
-    };
-
-    const goToChatForm = () => {
-        navigation.navigate('ChatForm');
-    };
 
 
     if (chats.length === 0) {
@@ -156,20 +157,21 @@ export default function AllChats() {
         setShowHomeComponent(false);
         setShowActividad(true);
     };
+    const openModal = () => {
+        setModalVisible(true);
+    };
     return (
         <View style={styles.chatsContainer}>
             <View style={styles.chatsContainer}>
                 {chats.map((chat, index) => (
                     <View style={styles.chat}>
-
                         <TouchableOpacity onPress={() => {
                             setSelectedImage(chat.img);
                             setImageModalVisible(true);
                         }}>
                             <Image
-                                source={{ uri: `${chat.img}` }}
+                                source={{ uri: `${chat.img}` || 'https://i.postimg.cc/7PGyJ45s/fotoUser.jpg' }}
                                 style={styles.image}
-
                             />
                         </TouchableOpacity>
 
@@ -177,7 +179,22 @@ export default function AllChats() {
                         <TouchableOpacity
 
                             key={chat.id}
-                            onPress={() => openEditModal(chat.id, chat.numero, chat.chat)}
+
+                            onPress={() => {
+
+                                openEditModal(
+                                    chat.id,
+                                    chat.numero,
+                                    chat.chat,
+                                    chat.chat1,
+                                    chat.chat2,
+                                    chat.num,
+                                    chat.estate,
+                                    chat.img // Make sure this is correct
+                                )
+
+                            }
+                            }
                         >
 
                             <View style={styles.deFlex2}>
@@ -253,17 +270,25 @@ export default function AllChats() {
                                     onPress={() => setEditModalVisible(false)}
                                 >
                                     <AntDesign name="arrowleft" size={24} color="#fff" />
+
                                     <Image
-                                        source={{ uri: selectedImage }}
+                                        source={{ uri: selectedImage || `https://i.postimg.cc/7PGyJ45s/fotoUser.jpg` }} // Use a 
                                         style={styles.imagePerfil}
                                         resizeMode="contain"
                                     />
+
+
+
                                 </TouchableOpacity>
 
-                                <TouchableOpacity style={styles.buttonCreate}>
+                                <TouchableOpacity style={styles.buttonCreate}
+                                    onPress={() => openModal()}>
                                     <Text style={styles.chatNombre}>{editChat}</Text>
                                 </TouchableOpacity>
                             </View>
+
+
+
 
                             <View style={styles.deFlexHeader2}>
                                 <FontAwesome name="video-camera" size={20} color="#FFF" />
@@ -290,9 +315,9 @@ export default function AllChats() {
 
                     {showModalContainer && (
                         < >
-                            {/* Edit Form */}
+
                             <View style={styles.inputsEdit}>
-                                {/* Edit Numero */}
+
                                 <View style={styles.inputsFlex}>
                                     <MaterialIcons
                                         name="description"
@@ -310,7 +335,7 @@ export default function AllChats() {
                                     />
                                 </View>
 
-                                {/* Edit Chat */}
+
                                 <View style={styles.inputsFlex}>
                                     <MaterialIcons
                                         name="description"
@@ -454,7 +479,44 @@ export default function AllChats() {
 
                 </ScrollView>
             </Modal>
+            <Modal
+                visible={modalVisible}
+                animationType="slide"
+                onRequestClose={() => setModalVisible(false)}
+            >
 
+                <ScrollView style={styles.modalContainer2}>
+                    <View style={styles.headerPerfil}>
+                        <View style={styles.deFlex2}>
+                            <TouchableOpacity onPress={() => setModalVisible(false)} >
+                                <AntDesign name="arrowleft" size={24} color="#000" />
+                            </TouchableOpacity>
+
+                            <Text style={styles.iconPuntos2}>...</Text>
+                        </View>
+
+
+                        <View style={styles.perfilChat}>
+                            <Image
+                                source={{ uri: selectedImage || `https://i.postimg.cc/7PGyJ45s/fotoUser.jpg` }} // Use a 
+                                style={styles.imageChatPerfil}
+                                resizeMode="contain"
+                            />
+                            <Text style={styles.nombreChatPerfil}>{editChat}</Text>
+                            <Text style={styles.numeroChatPerfil}>{editNumero}</Text>
+                        </View>
+                        <IconosChat />
+                    </View>
+
+                    <SituacionChat />
+
+                    <SeguridadChat />
+                    <Multimedia />
+                    <Notificaciones />
+                    <BloquearRepor />
+                </ScrollView>
+
+            </Modal>
             <Modal
                 visible={imageModalVisible}
                 animationIn="slideInLeft"
@@ -472,11 +534,24 @@ export default function AllChats() {
                         style={styles.modalOverlay}
                         onPress={() => setImageModalVisible(false)}
                     />
-                    <Image
-                        source={{ uri: selectedImage }}
-                        style={styles.fullScreenImage}
-                        resizeMode="contain"
-                    />
+                    <View style={styles.flexImg}>
+                        <Image
+                            source={{ uri: selectedImage || 'https://i.postimg.cc/7PGyJ45s/fotoUser.jpg' }}
+                            style={styles.fullScreenImage}
+                            resizeMode="contain"
+                        />
+
+                        <View style={styles.iconsFlex}>
+                            <FontAwesome name="video-camera" size={20} color="#25D366" />
+                            <MaterialIcons name="phone" size={22} color="#25D366" />
+                            <MaterialIcons
+                                name="chat"
+                                size={20}
+                                color="#25D366"
+                            />
+                            <Feather name="help-circle" size={24} color="#25D366" />
+                        </View>
+                    </View>
                     <TouchableOpacity
                         style={styles.closeButton}
                         onPress={() => setImageModalVisible(false)}
@@ -485,13 +560,9 @@ export default function AllChats() {
                     </TouchableOpacity>
                 </View>
             </Modal>
-
             <View style={styles.espacio}>
-
             </View>
-
-
-        </View>
+        </View >
     );
 }
 
@@ -609,7 +680,7 @@ const styles = StyleSheet.create({
     },
     chat: {
         flexDirection: 'row',
-        gap: 20,
+        gap: 13,
         width: '100%',
         paddingVertical: 10,
         paddingHorizontal: 15
@@ -638,9 +709,9 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     fullScreenImage: {
-        height: 300,
+        height: 220,
         width: 300,
-        marginTop: 20,
+
         objectFit: 'contain'
     },
     closeButton: {
@@ -745,6 +816,12 @@ const styles = StyleSheet.create({
         transform: [{ rotate: '90deg' }],
         color: '#fff',
     },
+    iconPuntos2: {
+        fontSize: 21,
+        fontWeight: 'bold',
+        transform: [{ rotate: '90deg' }],
+        color: 'rgba(0, 0, 0, 0.6)',
+    },
     imagePerfil: {
         width: 35,
         height: 35,
@@ -772,5 +849,52 @@ const styles = StyleSheet.create({
     opciones: {
 
         marginTop: -90
+    },
+    iconsFlex: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 10,
+        gap: 40
+    },
+    flexImg: {
+        flexDirection: 'column',
+
+        width: 293,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+    },
+    modalContainer2: {
+        backgroundColor: '#EEF3F4',
+        gap: 2
+
+
+    },
+    headerPerfil: {
+        padding: 10,
+        backgroundColor: '#fff',
+
+    },
+    perfilChat: {
+
+        height: 200,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 7,
+
+    },
+    imageChatPerfil: {
+        height: 120,
+        width: 120,
+        borderRadius: 100
+    },
+    numeroChatPerfil: {
+        fontSize: 19,
+        color: 'rgba(0, 0, 0, 0.6)',
+    },
+    nombreChatPerfil: {
+        fontSize: 20,
+        color: 'rgba(0, 0, 0, 0.9)',
     }
 })

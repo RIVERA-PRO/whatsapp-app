@@ -2,23 +2,32 @@ import React, { useState } from 'react';
 import { View, TouchableHighlight, Text, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+
 export default function ButonNewChat() {
     const [showButtons, setShowButtons] = useState(false);
-
+    const navigation = useNavigation();
     const handleTouch = () => {
         setShowButtons(!showButtons);
     };
-
+    const goToNewChat = () => {
+        navigation.navigate('NewChatScreen');
+        setShowButtons(!showButtons);
+    };
+    const goToNewEstado = () => {
+        navigation.navigate('NewEstadoSreen');
+        setShowButtons(!showButtons);
+    };
     return (
         <View style={styles.container}>
             {showButtons && (
                 <View style={styles.buttonContainer}>
 
-                    <TouchableHighlight onPress={() => console.log('Botón 1 presionado')} underlayColor="transparent" style={styles.button}>
+                    <TouchableHighlight onPress={() => goToNewChat()} underlayColor="transparent" style={styles.button}>
                         <MaterialIcons name="chat" size={24} color="#fff" />
                     </TouchableHighlight>
-                    <TouchableHighlight onPress={() => console.log('Botón 2 presionado')} underlayColor="transparent" style={styles.button}>
-                        <MaterialIcons name="chat" size={24} color="#fff" />
+                    <TouchableHighlight onPress={() => goToNewEstado()} underlayColor="transparent" style={styles.button}>
+                        <Feather name="camera" size={24} color="#fff" />
                     </TouchableHighlight>
                 </View>
             )}

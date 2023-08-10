@@ -11,6 +11,7 @@ import ChatCantidad from '../components/ChatCantidad';
 import { MaterialIcons } from '@expo/vector-icons';
 import EstadosAll from '../components/EstadosAll';
 import Grupo from '../components/Grupo';
+import EstadosCantidad from '../components/EstadosCantidad';
 const windowWidth = Dimensions.get('window').width;
 
 export default function Home() {
@@ -110,7 +111,7 @@ export default function Home() {
                                 >
                                     Estados
                                 </Text>
-
+                                <EstadosCantidad />
                             </View>
 
                             {selectedComponent === 'EstadosAll' && <View style={styles.selectedIndicator} />}

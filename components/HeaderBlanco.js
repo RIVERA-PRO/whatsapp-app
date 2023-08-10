@@ -32,7 +32,10 @@ export default function Header() {
         navigation.navigate('NewChatScreen');
         setModalVisible(!isModalVisible);
     };
-
+    const goToNewEstado = () => {
+        navigation.navigate('NewEstadoSreen');
+        setModalVisible(!isModalVisible);
+    };
 
     const openLinkedInProfile = () => {
         const linkedInURL = 'https://www.linkedin.com/in/juan-rivera-9ba866215/'; // Reemplaza con tu URL de LinkedIn
@@ -94,7 +97,10 @@ export default function Header() {
                             <MaterialCommunityIcons name="chat" size={20} color='#128C7E' />
                             <Text style={styles.buttonText}>Nuevo Chat</Text>
                         </TouchableOpacity>
-
+                        <TouchableOpacity onPress={goToNewEstado} style={styles.btnNav}>
+                            <MaterialCommunityIcons name="chat" size={20} color='#128C7E' />
+                            <Text style={styles.buttonText}>Nuevo Estado</Text>
+                        </TouchableOpacity>
 
                         <Text style={styles.text}>Contacto del desarrollador</Text>
                         <View style={styles.social}>

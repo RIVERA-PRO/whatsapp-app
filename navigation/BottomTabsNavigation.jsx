@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet, Text, View, image, style, Platform } from 'react-native';
 import Home from '../screens/Home'
 import NewChatScreen from "../screens/NewChatScreen";
+import NewEstadoSreen from "../screens/NewEstadoSreen";
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -89,7 +90,30 @@ function BottomTabsNavigation() {
                     ),
                 }}
             />
+            <Tab.Screen
+                name="NewEstadoSreen"
+                component={NewEstadoSreen}
+                options={{
+                    tabBarButton: () => null, // Ocultar el botón del tab
+                    tabBarStyle: {
+                        backgroundColor: 'transparent',
+                        height: 56,
+                        elevation: 0,
+                        position: 'absolute',
+                        borderRadius: 100,
+                        marginBottom: -100,
+                        margin: 10
 
+                    },
+                    activeTintColor: '#D71920',
+                    inactiveTintColor: '#9B9B9B',
+                    headerShown: false,
+                    tabBarLabel: 'NewEstadoSreen',
+                    tabBarIcon: ({ color }) => (
+                        <FontAwesome name="home" size={24} color={color} />
+                    ),
+                }}
+            />
         </Tab.Navigator >
     );
 }

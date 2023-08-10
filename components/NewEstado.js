@@ -14,10 +14,12 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { launchImageLibraryAsync } from 'expo-image-picker';
 
-export default function NewChat() {
-    const [number, setNumber] = useState('');
+export default function NewEstado() {
+    const [fecha, setFecha] = useState('');
     const [image, setImage] = useState('');
-    const [chatName, setChatName] = useState('');
+    const [image2, setImage2] = useState('');
+    const [EstadoName, setEstadoName] = useState('');
+    const [EstadoDescripcion, setEstadoDescripcion] = useState('');
     const [showAlert, setShowAlert] = useState(false);
     const [showAlertError, setShowAlertError] = useState(false);
     const navigation = useNavigation();
@@ -38,8 +40,26 @@ export default function NewChat() {
             console.error('Error seleccionando la imagen:', error);
         }
     };
-    const crearChat = async () => {
-        if (number === '' || chatName === '') {
+
+    const selectImage2 = async () => {
+        try {
+            const result = await launchImageLibraryAsync({
+                mediaTypes: 'Images',
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 1,
+            });
+
+            if (!result.cancelled) {
+                setImage2(result.uri); // Correct this line to setImage2 instead of setImage
+            }
+        } catch (error) {
+            console.error('Error selecting image:', error);
+        }
+    };
+
+    const crearEstado = async () => {
+        if (fecha === '' || EstadoName === '') {
             console.log('los campos no pueden estar vacios');
             setShowAlertError(true);
             setTimeout(() => {
@@ -51,21 +71,27 @@ export default function NewChat() {
         try {
             const chat = {
                 id: new Date().getTime().toString(),
-                numero: number,
-                chat: chatName,
+                fecha: fecha,
+                estadoName: EstadoName,
                 img: image,
+                img2: image2,
+                estadoDescrip: EstadoDescripcion,
                 createdAt: new Date(),
             };
 
-            let chats = await AsyncStorage.getItem('chats');
+            console.log(chat)
+
+            let chats = await AsyncStorage.getItem('estados');
             chats = chats ? JSON.parse(chats) : [];
 
             chats.push(chat);
 
-            await AsyncStorage.setItem('chats', JSON.stringify(chats));
-            setNumber('');
-            setChatName('');
+            await AsyncStorage.setItem('estados', JSON.stringify(chats));
+            setFecha('');
+            setEstadoName('');
             setImage('');
+            setImage2('');
+            setEstadoDescripcion('')
             setShowAlert(true);
             setTimeout(() => {
                 setShowAlert(false);
@@ -73,6 +99,8 @@ export default function NewChat() {
             setTimeout(() => {
                 navigation.navigate('Home');
             }, 600);
+
+            console.log('estado creado');
         } catch (error) {
             console.log(error);
         }
@@ -80,34 +108,53 @@ export default function NewChat() {
 
     return (
         <View style={styles.form}>
-            {image !== '' && (
-                <Image source={{ uri: image }} style={styles.selectedImage} />
-            )}
+            <View style={styles.deFlexImg}>
+                {image !== '' && (
+                    <Image source={{ uri: image }} style={styles.selectedImage} />
+                )}
+                {image2 !== '' && (
+                    <Image source={{ uri: image2 }} style={styles.selectedImage} />
+                )}
+            </View>
             <View style={styles.inputsFlex}>
                 <TouchableOpacity onPress={selectImage}>
-                    <Text style={styles.inputSelecImage}>Seleccionar Imagen</Text>
+                    <Text style={styles.inputSelecImage}>Seleccionar Imagen del estado                                 </Text>
+                </TouchableOpacity>
+            </View>
+
+            <View style={styles.inputsFlex}>
+                <TouchableOpacity onPress={selectImage2}>
+                    <Text style={styles.inputSelecImage}>Seleccionar Imagen del usuario                                </Text>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.inputsFlex}>
                 <TextInput
                     style={styles.input}
-                    value={number}
-                    placeholder="Telefono"
-                    keyboardType="numeric"
-                    onChangeText={setNumber}
+                    value={EstadoName}
+                    placeholder="Nombre del usuario"
+                    onChangeText={setEstadoName}
+                />
+            </View>
+
+            <View style={styles.inputsFlex}>
+                <TextInput
+                    style={styles.input}
+                    value={EstadoDescripcion}
+                    placeholder="Texto del estado"
+                    onChangeText={setEstadoDescripcion}
                 />
             </View>
             <View style={styles.inputsFlex}>
                 <TextInput
                     style={styles.input}
-                    value={chatName}
-                    placeholder="Nombre"
-                    onChangeText={setChatName}
+                    value={fecha}
+                    placeholder="Fecha"
+
+                    onChangeText={setFecha}
                 />
             </View>
-
-            <TouchableOpacity style={styles.guardar} onPress={crearChat}>
+            <TouchableOpacity style={styles.guardar} onPress={crearEstado}>
                 <Text style={styles.guardarText}>Guardar</Text>
             </TouchableOpacity>
             <Dialog
@@ -115,7 +162,7 @@ export default function NewChat() {
                 onTouchOutside={() => setShowAlert(false)}
             >
                 <View style={styles.agregado}>
-                    <Text>Chat Creado!</Text>
+                    <Text>Estado Creado!</Text>
                 </View>
             </Dialog>
             <Dialog
@@ -180,12 +227,16 @@ const styles = StyleSheet.create({
 
     },
     selectedImage: {
-        width: 150,
-        height: 150,
+        width: 50,
+        height: 50,
         marginTop: 10,
         resizeMode: 'cover',
         borderRadius: 100,
         margin: 10
+    },
+
+    deFlexImg: {
+        flexDirection: 'row'
     },
     inputSelecImage: {
         color: 'rgba(0, 0, 0, 0.4)',
