@@ -32,6 +32,7 @@ import IconosChat from './IconosChat';
 import BloquearRepor from './BloquearRepor';
 import Notificaciones from './Notificaciones';
 import Multimedia from './Multimedia';
+import ChatMensaje from './ChatMensaje';
 export default function AllChats() {
     const isFocused = useIsFocused();
     const [chats, setChats] = useState([]);
@@ -255,80 +256,134 @@ export default function AllChats() {
                 animationType="slide"
                 onRequestClose={() => setEditModalVisible(false)}
             >
-                <ScrollView style={styles.modalContainer}>
-
-                    <LinearGradient
-                        colors={['#128C7E', '#128C7E']}
-                        style={styles.container}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                    >
-                        <View style={styles.headerAtras2}>
-                            <View style={styles.deFlexHeader}>
-                                <TouchableOpacity
-                                    style={styles.atras}
-                                    onPress={() => setEditModalVisible(false)}
-                                >
-                                    <AntDesign name="arrowleft" size={24} color="#fff" />
-
-                                    <Image
-                                        source={{ uri: selectedImage || `https://i.postimg.cc/7PGyJ45s/fotoUser.jpg` }} // Use a 
-                                        style={styles.imagePerfil}
-                                        resizeMode="contain"
-                                    />
 
 
+                <LinearGradient
+                    colors={['#128C7E', '#128C7E']}
+                    style={styles.container}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                >
+                    <View style={styles.headerAtras2}>
+                        <View style={styles.deFlexHeader}>
+                            <TouchableOpacity
+                                style={styles.atras}
+                                onPress={() => setEditModalVisible(false)}
+                            >
+                                <AntDesign name="arrowleft" size={24} color="#fff" />
 
-                                </TouchableOpacity>
-
-                                <TouchableOpacity style={styles.buttonCreate}
-                                    onPress={() => openModal()}>
-                                    <Text style={styles.chatNombre}>{editChat}</Text>
-                                </TouchableOpacity>
-                            </View>
+                                <Image
+                                    source={{ uri: selectedImage || `https://i.postimg.cc/7PGyJ45s/fotoUser.jpg` }} // Use a 
+                                    style={styles.imagePerfil}
+                                    resizeMode="contain"
+                                />
 
 
 
+                            </TouchableOpacity>
 
-                            <View style={styles.deFlexHeader2}>
-                                <FontAwesome name="video-camera" size={20} color="#FFF" />
-                                <MaterialIcons name="phone" size={22} color="#FFF" />
-                                <TouchableOpacity
-                                    style={styles.buttonCreate}
-                                    onPress={() => setShowModalContainer(!showModalContainer)}
-                                >
-                                    <Text style={styles.iconPuntos}>...</Text>
-
-                                </TouchableOpacity>
-                            </View>
-
+                            <TouchableOpacity style={styles.buttonCreate}
+                                onPress={() => openModal()}>
+                                <Text style={styles.chatNombre}>{editChat}</Text>
+                            </TouchableOpacity>
                         </View>
 
 
 
-                    </LinearGradient>
+
+                        <View style={styles.deFlexHeader2}>
+                            <FontAwesome name="video-camera" size={20} color="#FFF" />
+                            <MaterialIcons name="phone" size={22} color="#FFF" />
+                            <TouchableOpacity
+                                style={styles.buttonCreate}
+                                onPress={() => setShowModalContainer(!showModalContainer)}
+                            >
+                                <Text style={styles.iconPuntos}>...</Text>
+
+                            </TouchableOpacity>
+                        </View>
+
+                    </View>
+
+
+
+                </LinearGradient>
 
 
 
 
 
 
-                    {showModalContainer && (
-                        < >
+                {showModalContainer && (
+                    < >
 
-                            <View style={styles.inputsEdit}>
+                        <View style={styles.inputsEdit}>
 
+                            <View style={styles.inputsFlex}>
+                                <MaterialIcons
+                                    name="description"
+                                    size={20}
+                                    color="rgba(0, 0, 0, 0.3)"
+                                    style={styles.Icon}
+                                />
+                                <TextInput
+                                    value={editNumero}
+                                    onChangeText={setEditNumero}
+                                    placeholder="Número"
+                                    style={styles.inputEdit}
+                                    multiline={true}
+
+                                />
+                            </View>
+
+
+                            <View style={styles.inputsFlex}>
+                                <MaterialIcons
+                                    name="description"
+                                    size={20}
+                                    color="rgba(0, 0, 0, 0.3)"
+                                    style={styles.Icon2}
+                                />
+                                <TextInput
+                                    value={editChat}
+                                    onChangeText={setEditChat}
+                                    placeholder="Chat"
+                                    style={styles.inputEdit}
+                                    multiline={true}
+
+                                />
+                            </View>
+
+                            <View style={styles.buttonContainer}>
+                                <View style={styles.buttonBtns}>
+                                    <TouchableOpacity
+                                        style={[styles.button, showHomeComponent && styles.activeButton]}
+                                        onPress={showHome}
+                                    >
+                                        <Text style={[styles.buttonText, showHomeComponent && styles.activeButtonText]}>Msje enviado</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[styles.button, showActividad && styles.activeButton]}
+                                        onPress={showActividadComponent}
+                                    >
+                                        <Text style={[styles.buttonText, showActividad && styles.activeButtonText]}>Msje recibido</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+
+                            {showHomeComponent && <View style={styles.opciones}>
                                 <View style={styles.inputsFlex}>
                                     <MaterialIcons
-                                        name="description"
+                                        name="chat"
                                         size={20}
                                         color="rgba(0, 0, 0, 0.3)"
                                         style={styles.Icon}
                                     />
+
                                     <TextInput
-                                        value={editNumero}
-                                        onChangeText={setEditNumero}
-                                        placeholder="Número"
+                                        value={editChat1}
+                                        onChangeText={setEditChat1}
+                                        placeholder="Mensaje enviado"
                                         style={styles.inputEdit}
                                         multiline={true}
 
@@ -336,148 +391,94 @@ export default function AllChats() {
                                 </View>
 
 
+                                <View style={styles.inputsFlex2}>
+                                    <Ionicons
+                                        name="md-checkmark-done-sharp"
+                                        size={20}
+                                        color="rgba(0, 0, 0, 0.3)"
+                                        style={styles.Icon2}
+                                    />
+
+                                    <Picker
+                                        selectedValue={editEstate}
+                                        onValueChange={setEditEstate}
+                                        style={styles.inputEdit}
+                                    >
+                                        <Picker.Item label="Mensaje visto / no visto" value="" />
+                                        <Picker.Item label="Visto" value="visto" />
+                                        <Picker.Item label="No visto" value="noVisto" />
+                                    </Picker>
+                                </View>
+                            </View>
+                            }
+
+
+                            {showActividad && <View style={styles.opciones}>
+
+
                                 <View style={styles.inputsFlex}>
                                     <MaterialIcons
-                                        name="description"
+                                        name="chat"
                                         size={20}
                                         color="rgba(0, 0, 0, 0.3)"
                                         style={styles.Icon2}
                                     />
                                     <TextInput
-                                        value={editChat}
-                                        onChangeText={setEditChat}
-                                        placeholder="Chat"
+                                        value={editChat2}
+                                        onChangeText={setEditChat2}
+                                        placeholder="Mensaje recibido"
                                         style={styles.inputEdit}
                                         multiline={true}
 
                                     />
                                 </View>
 
-                                <View style={styles.buttonContainer}>
-                                    <View style={styles.buttonBtns}>
-                                        <TouchableOpacity
-                                            style={[styles.button, showHomeComponent && styles.activeButton]}
-                                            onPress={showHome}
-                                        >
-                                            <Text style={[styles.buttonText, showHomeComponent && styles.activeButtonText]}>Msje enviado</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            style={[styles.button, showActividad && styles.activeButton]}
-                                            onPress={showActividadComponent}
-                                        >
-                                            <Text style={[styles.buttonText, showActividad && styles.activeButtonText]}>Msje recibido</Text>
-                                        </TouchableOpacity>
-                                    </View>
+                                <View style={styles.inputsFlex}>
+                                    <Octicons
+                                        name="number"
+                                        size={20}
+                                        color="rgba(0, 0, 0, 0.3)"
+                                        style={styles.Icon2}
+                                    />
+                                    <TextInput
+                                        value={editNum}
+                                        onChangeText={setEditNum}
+                                        placeholder="Numero de mensajes"
+                                        style={styles.inputEdit}
+                                        multiline={true}
+                                        keyboardType='numeric'
+
+                                    />
                                 </View>
-
-                                {showHomeComponent && <View style={styles.opciones}>
-                                    <View style={styles.inputsFlex}>
-                                        <MaterialIcons
-                                            name="chat"
-                                            size={20}
-                                            color="rgba(0, 0, 0, 0.3)"
-                                            style={styles.Icon}
-                                        />
-
-                                        <TextInput
-                                            value={editChat1}
-                                            onChangeText={setEditChat1}
-                                            placeholder="Mensaje enviado"
-                                            style={styles.inputEdit}
-                                            multiline={true}
-
-                                        />
-                                    </View>
-
-
-                                    <View style={styles.inputsFlex2}>
-                                        <Ionicons
-                                            name="md-checkmark-done-sharp"
-                                            size={20}
-                                            color="rgba(0, 0, 0, 0.3)"
-                                            style={styles.Icon2}
-                                        />
-
-                                        <Picker
-                                            selectedValue={editEstate}
-                                            onValueChange={setEditEstate}
-                                            style={styles.inputEdit}
-                                        >
-                                            <Picker.Item label="Mensaje visto / no visto" value="" />
-                                            <Picker.Item label="Visto" value="visto" />
-                                            <Picker.Item label="No visto" value="noVisto" />
-                                        </Picker>
-                                    </View>
-                                </View>
-                                }
-
-
-                                {showActividad && <View style={styles.opciones}>
-
-
-                                    <View style={styles.inputsFlex}>
-                                        <MaterialIcons
-                                            name="chat"
-                                            size={20}
-                                            color="rgba(0, 0, 0, 0.3)"
-                                            style={styles.Icon2}
-                                        />
-                                        <TextInput
-                                            value={editChat2}
-                                            onChangeText={setEditChat2}
-                                            placeholder="Mensaje recibido"
-                                            style={styles.inputEdit}
-                                            multiline={true}
-
-                                        />
-                                    </View>
-
-                                    <View style={styles.inputsFlex}>
-                                        <Octicons
-                                            name="number"
-                                            size={20}
-                                            color="rgba(0, 0, 0, 0.3)"
-                                            style={styles.Icon2}
-                                        />
-                                        <TextInput
-                                            value={editNum}
-                                            onChangeText={setEditNum}
-                                            placeholder="Numero de mensajes"
-                                            style={styles.inputEdit}
-                                            multiline={true}
-                                            keyboardType='numeric'
-
-                                        />
-                                    </View>
-                                </View>}
+                            </View>}
 
 
 
-                            </View>
+                        </View>
 
-                            <View style={styles.deFlexButon}>
+                        <View style={styles.deFlexButon}>
+                            <TouchableOpacity
+                                style={styles.buttonGuardar}
+                                onPress={() => saveEdit()}
+                            >
+                                <Text style={styles.buttonTextok}>Guardar</Text>
+                            </TouchableOpacity>
+                            <View style={styles.deFlex2}>
                                 <TouchableOpacity
-                                    style={styles.buttonGuardar}
-                                    onPress={() => saveEdit()}
+                                    style={styles.buttonEliminar}
+                                    onPress={() => deleteChat()}
                                 >
-                                    <Text style={styles.buttonTextok}>Guardar</Text>
+                                    <Text style={styles.buttonTextok}>Eliminar</Text>
                                 </TouchableOpacity>
-                                <View style={styles.deFlex2}>
-                                    <TouchableOpacity
-                                        style={styles.buttonEliminar}
-                                        onPress={() => deleteChat()}
-                                    >
-                                        <Text style={styles.buttonTextok}>Eliminar</Text>
-                                    </TouchableOpacity>
-                                </View>
                             </View>
-                        </>
-                    )}
+                        </View>
+                    </>
+                )}
+
+                <ChatMensaje />
 
 
 
-
-                </ScrollView>
             </Modal>
             <Modal
                 visible={modalVisible}
