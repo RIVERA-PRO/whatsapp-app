@@ -24,12 +24,14 @@ import { useNavigation } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons'
 import { Octicons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-
-export default function EstadosAll() {
+import PhotoPerfil from './PhotoPerfil';
+import PhotoEstadoPerfil from './PhotoEstadoPerfil';
+export default function MiEstadoAll() {
     const isFocused = useIsFocused();
     const [estados, setEstados] = useState([]);
     const navigation = useNavigation();
     const [progress, setProgress] = useState(0);
+
 
     const [selectedEstadoId, setSelectedEstadoId] = useState(null);
 
@@ -49,6 +51,23 @@ export default function EstadosAll() {
     useEffect(() => {
         fetchEstados();
     }, [isFocused]);
+    const [viewModalVisible, setViewModalVisible] = useState(false);
+
+    const openViewsModal = () => {
+        clearInterval(intervalId); // Pause the countdown timer
+        setViewModalVisible(true);
+    };
+
+    const closeViewsModal = () => {
+        setViewModalVisible(false);
+
+    };
+
+    const [countdown, setCountdown] = useState(5);
+    let intervalId;
+
+
+
     useEffect(() => {
         let intervalId;
 
@@ -58,24 +77,26 @@ export default function EstadosAll() {
             let currentProgress = 0;
 
             intervalId = setInterval(() => {
-                currentProgress += 1;
+                currentProgress += 0.6;
                 setProgress(currentProgress);
 
                 if (currentProgress >= maxProgress) {
                     clearInterval(intervalId);
                     setImageModalVisible(false);
                     setShowStatusBar(true);
+                    setViewModalVisible(false);
                 }
+
+
             }, intervalDuration);
         }
 
         return () => clearInterval(intervalId);
     }, [imageModalVisible]);
 
-
     const fetchEstados = async () => {
         try {
-            const savedEstados = await AsyncStorage.getItem('estados');
+            const savedEstados = await AsyncStorage.getItem('miestado');
             if (savedEstados) {
                 const parsedEstados = JSON.parse(savedEstados);
                 const orderedEstados = parsedEstados.reverse().map(estado => ({
@@ -94,21 +115,17 @@ export default function EstadosAll() {
     };
 
 
+    const goToNewMiEstado = () => {
+        navigation.navigate('NewMiEstado');
 
-
-
-    if (estados.length === 0) {
-        return (
-            <Text style={styles.noResult}>No hay estados</Text>
-        );
-    }
+    };
 
     const removeSelectedEstado = async () => {
         if (selectedEstadoId) {
             try {
                 // Remove the selected estado from AsyncStorage
                 const updatedEstados = estados.filter(estado => estado.id !== selectedEstadoId);
-                await AsyncStorage.setItem('estados', JSON.stringify(updatedEstados));
+                await AsyncStorage.setItem('miestado', JSON.stringify(updatedEstados));
 
                 // Update the state to reflect the changes
                 setEstados(updatedEstados);
@@ -119,10 +136,24 @@ export default function EstadosAll() {
             }
         }
     };
+    if (estados.length === 0) {
+        return (
+            <TouchableOpacity onPress={goToNewMiEstado} style={styles.btnNewEstado}>
+                <PhotoPerfil />
+
+                <View style={styles.noResultColumnText}>
+                    <Text style={styles.estadoText}>Mi Estado</Text>
+                    <Text style={styles.dateText}>Añade una actualización</Text>
+                </View>
+            </TouchableOpacity>
+        );
+    }
+
+
 
     return (
         <View style={styles.estadosContainer}>
-            <Text style={styles.recientes}>Recientes</Text>
+
 
             <View >
                 {estados.map((estado, index) => (
@@ -192,11 +223,7 @@ export default function EstadosAll() {
                                 onPress={() => setImageModalVisible(false)}
                             >
                                 <AntDesign name="arrowleft" size={24} color="#fff" />
-                                <Image
-                                    source={{ uri: estados.find(estado => estado.id === selectedEstadoId)?.img2 }}
-                                    style={styles.imagePerfil}
-                                    resizeMode="contain"
-                                />
+                                <PhotoEstadoPerfil />
                                 <View>
                                     <Text style={styles.textEstadoName}>{estados.find(estado => estado.id === selectedEstadoId)?.estadoName.slice(0, 17)}</Text>
                                     <Text style={styles.textEstadoFecha}>{estados.find(estado => estado.id === selectedEstadoId)?.fecha.slice(0, 9)}</Text>
@@ -230,25 +257,43 @@ export default function EstadosAll() {
                         <Text style={styles.textEstadoDescrip}>{estados.find(estado => estado.id === selectedEstadoId)?.estadoDescrip.slice(0, 250)}</Text>
 
                     </ScrollView>
-
-                    <View style={styles.responder}>
-                        <AntDesign name="up" size={18} color="#FFF" />
-                        <Text style={styles.responderText}>Responder</Text>
-                    </View>
-
-                    <TouchableOpacity
-                        style={styles.closeButton}
-                        onPress={() => setImageModalVisible(false)}
-                    >
-
+                    <TouchableOpacity style={styles.responder} onPress={openViewsModal}>
+                        <Ionicons name="eye-outline" size={20} color="#fff" />
+                        <Text style={styles.responderText}>Vistas</Text>
                     </TouchableOpacity>
+
                 </View>
             </Modal>
+            <Modal
+                visible={viewModalVisible}
+                transparent={true}
+                animationIn="slideInLeft"
+                animationOut="slideOutLeft"
+                swipeDirection="left"
+                onSwipeComplete={viewModalVisible}
 
-            <View style={styles.espacio}>
 
-            </View>
+                animationType="fade"
+            >
 
+                <View style={styles.viewModalContainer} >
+
+                    <TouchableOpacity style={styles.headerModal} onPress={closeViewsModal}>
+                        <Text style={styles.viewModalCloseButtonText}>Visto por </Text>
+                        <View style={styles.deFlexVistas}>
+                            <MaterialIcons name="delete" size={24} color="#fff" />
+                            <MaterialCommunityIcons name="share" size={24} color="#fff" />
+                        </View>
+                    </TouchableOpacity>
+
+                    <ScrollView style={styles.viewContainer}>
+
+                        <Text style={styles.viewModalTitle}>Vistas</Text>
+
+
+                    </ScrollView>
+                </View>
+            </Modal>
 
         </View>
     );
@@ -256,7 +301,7 @@ export default function EstadosAll() {
 
 const styles = StyleSheet.create({
     estadosContainer: {
-
+        paddingTop: 6,
     },
 
     estadoText: {
@@ -269,7 +314,8 @@ const styles = StyleSheet.create({
         gap: 13,
         width: '100%',
         paddingVertical: 10,
-        paddingHorizontal: 15
+        paddingHorizontal: 15,
+        marginTop: 25
     },
 
     dateText: {
@@ -405,9 +451,9 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     fullScreenImage: {
-        height: '70%',
+        height: 300,
         width: '100%',
-
+        marginTop: 70
 
     },
     closeButton: {
@@ -566,9 +612,10 @@ const styles = StyleSheet.create({
     responder: {
         position: 'absolute',
         top: '92%',
-        flexDirection: 'column',
+        flexDirection: 'row',
         alignItems: 'center',
         color: '#fff',
+        gap: 10
 
     },
     responderText: {
@@ -595,6 +642,48 @@ const styles = StyleSheet.create({
     recientes: {
         color: 'rgba(0, 0, 0, 0.6)',
         padding: 15
+    },
+    btnNewEstado: {
+        flexDirection: 'row',
+        gap: 13,
+        width: '100%',
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        marginTop: 25,
+        alignItems: 'center'
+    },
+    viewModalContainer: {
+        height: 500,
+        backgroundColor: '#fff',
+        flexDirection: 'row',
+
+        flexDirection: 'column',
+        top: '40%',
+        marginHorizontal: 10,
+        borderRadius: 7,
+        overflow: 'hidden',
+
+    },
+    headerModal: {
+        backgroundColor: '#25D366',
+
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingVertical: 20
+    },
+    deFlexVistas: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        gap: 20
+    },
+    viewModalCloseButtonText: {
+        color: '#fff',
+        fontSize: 17
+    },
+    viewContainer: {
+        paddingHorizontal: 20,
+        paddingVertical: 20,
     }
 
 })

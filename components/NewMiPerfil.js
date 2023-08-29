@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     StyleSheet,
@@ -7,29 +7,27 @@ import {
     Text,
     Image
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+import ImagePicker from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Dialog } from 'react-native-popup-dialog';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { launchImageLibraryAsync } from 'expo-image-picker';
 
-
-export default function NewEstado() {
-    const [fecha, setFecha] = useState('');
+export default function NewMiPerfil() {
+    const [number, setNumber] = useState('');
     const [image, setImage] = useState('');
-    const [image2, setImage2] = useState('');
-    const [EstadoName, setEstadoName] = useState('');
-    const [EstadoDescripcion, setEstadoDescripcion] = useState('');
+    const [chatName, setChatName] = useState('');
     const [showAlert, setShowAlert] = useState(false);
     const [showAlertError, setShowAlertError] = useState(false);
     const navigation = useNavigation();
 
     const selectImage = async () => {
         try {
-            const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            const result = await launchImageLibraryAsync({
+                mediaTypes: 'Images', // Puedes cambiar esto según tus necesidades
                 allowsEditing: true,
+                aspect: [4, 3],
                 quality: 1,
             });
 
@@ -40,32 +38,8 @@ export default function NewEstado() {
             console.error('Error seleccionando la imagen:', error);
         }
     };
-
-    const selectImage2 = async () => {
-        try {
-            const result = await launchImageLibraryAsync({
-                mediaTypes: 'Images',
-                allowsEditing: true,
-                aspect: [4, 3],
-                quality: 1,
-            });
-
-            if (!result.cancelled) {
-                setImage2(result.uri); // Correct this line to setImage2 instead of setImage
-            }
-        } catch (error) {
-            console.error('Error selecting image:', error);
-        }
-    };
-
-
-
-
-
-
-
-    const crearEstado = async () => {
-        if (fecha === '' || EstadoName === '') {
+    const crearChat = async () => {
+        if (number === '' || chatName === '') {
             console.log('los campos no pueden estar vacios');
             setShowAlertError(true);
             setTimeout(() => {
@@ -77,27 +51,21 @@ export default function NewEstado() {
         try {
             const chat = {
                 id: new Date().getTime().toString(),
-                fecha: fecha,
-                estadoName: EstadoName,
+                numero: number,
+                chat: chatName,
                 img: image,
-                img2: image2,
-                estadoDescrip: EstadoDescripcion,
                 createdAt: new Date(),
             };
 
-            console.log(chat)
-
-            let chats = await AsyncStorage.getItem('estados');
+            let chats = await AsyncStorage.getItem('miperfil');
             chats = chats ? JSON.parse(chats) : [];
 
             chats.push(chat);
 
-            await AsyncStorage.setItem('estados', JSON.stringify(chats));
-            setFecha('');
-            setEstadoName('');
+            await AsyncStorage.setItem('miperfil', JSON.stringify(chats));
+            setNumber('');
+            setChatName('');
             setImage('');
-            setImage2('');
-            setEstadoDescripcion('')
             setShowAlert(true);
             setTimeout(() => {
                 setShowAlert(false);
@@ -105,8 +73,6 @@ export default function NewEstado() {
             setTimeout(() => {
                 navigation.navigate('Home');
             }, 600);
-
-            console.log('estado creado');
         } catch (error) {
             console.log(error);
         }
@@ -114,53 +80,34 @@ export default function NewEstado() {
 
     return (
         <View style={styles.form}>
-            <View style={styles.deFlexImg}>
-                {image !== '' && (
-                    <Image source={{ uri: image }} style={styles.selectedImage} />
-                )}
-                {image2 !== '' && (
-                    <Image source={{ uri: image2 }} style={styles.selectedImage} />
-                )}
-            </View>
+            {image !== '' && (
+                <Image source={{ uri: image }} style={styles.selectedImage} />
+            )}
             <View style={styles.inputsFlex}>
                 <TouchableOpacity onPress={selectImage}>
-                    <Text style={styles.inputSelecImage}>Seleccionar Imagen del estado                                 </Text>
-                </TouchableOpacity>
-            </View>
-
-            <View style={styles.inputsFlex}>
-                <TouchableOpacity onPress={selectImage2}>
-                    <Text style={styles.inputSelecImage}>Seleccionar Imagen del usuario                                </Text>
+                    <Text style={styles.inputSelecImage}>Seleccionar Imagen</Text>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.inputsFlex}>
                 <TextInput
                     style={styles.input}
-                    value={EstadoName}
-                    placeholder="Nombre del usuario"
-                    onChangeText={setEstadoName}
-                />
-            </View>
-
-            <View style={styles.inputsFlex}>
-                <TextInput
-                    style={styles.input}
-                    value={EstadoDescripcion}
-                    placeholder="Texto del estado"
-                    onChangeText={setEstadoDescripcion}
+                    value={number}
+                    placeholder="Telefono"
+                    keyboardType="numeric"
+                    onChangeText={setNumber}
                 />
             </View>
             <View style={styles.inputsFlex}>
                 <TextInput
                     style={styles.input}
-                    value={fecha}
-                    placeholder="Fecha"
-
-                    onChangeText={setFecha}
+                    value={chatName}
+                    placeholder="Nombre"
+                    onChangeText={setChatName}
                 />
             </View>
-            <TouchableOpacity style={styles.guardar} onPress={crearEstado}>
+
+            <TouchableOpacity style={styles.guardar} onPress={crearChat}>
                 <Text style={styles.guardarText}>Guardar</Text>
             </TouchableOpacity>
             <Dialog
@@ -168,7 +115,7 @@ export default function NewEstado() {
                 onTouchOutside={() => setShowAlert(false)}
             >
                 <View style={styles.agregado}>
-                    <Text>Estado Creado!</Text>
+                    <Text>Perfil Creado!</Text>
                 </View>
             </Dialog>
             <Dialog
@@ -193,7 +140,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3,
         elevation: 1,
-        marginTop: 200,
+
         justifyContent: 'center',
         alignItems: 'center'
 
@@ -233,16 +180,12 @@ const styles = StyleSheet.create({
 
     },
     selectedImage: {
-        width: 50,
-        height: 50,
+        width: 150,
+        height: 150,
         marginTop: 10,
         resizeMode: 'cover',
         borderRadius: 100,
         margin: 10
-    },
-
-    deFlexImg: {
-        flexDirection: 'row'
     },
     inputSelecImage: {
         color: 'rgba(0, 0, 0, 0.4)',

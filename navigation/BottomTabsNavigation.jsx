@@ -4,6 +4,8 @@ import { StyleSheet, Text, View, image, style, Platform } from 'react-native';
 import Home from '../screens/Home'
 import NewChatScreen from "../screens/NewChatScreen";
 import NewEstadoSreen from "../screens/NewEstadoSreen";
+import NewMiEstado from "../screens/NewMiEstado";
+import NewMiPerfilScreen from "../screens/NewMiPerfilScreen";
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -109,6 +111,54 @@ function BottomTabsNavigation() {
                     inactiveTintColor: '#9B9B9B',
                     headerShown: false,
                     tabBarLabel: 'NewEstadoSreen',
+                    tabBarIcon: ({ color }) => (
+                        <FontAwesome name="home" size={24} color={color} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="NewMiEstado"
+                component={NewMiEstado}
+                options={{
+                    tabBarButton: () => null, // Ocultar el botón del tab
+                    tabBarStyle: {
+                        backgroundColor: 'transparent',
+                        height: 56,
+                        elevation: 0,
+                        position: 'absolute',
+                        borderRadius: 100,
+                        marginBottom: -100,
+                        margin: 10
+
+                    },
+                    activeTintColor: '#D71920',
+                    inactiveTintColor: '#9B9B9B',
+                    headerShown: false,
+                    tabBarLabel: 'NewMiEstado',
+                    tabBarIcon: ({ color }) => (
+                        <FontAwesome name="home" size={24} color={color} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="NewMiPerfilScreen"
+                component={NewMiPerfilScreen}
+                options={{
+                    tabBarButton: () => null, // Ocultar el botón del tab
+                    tabBarStyle: {
+                        backgroundColor: 'transparent',
+                        height: 56,
+                        elevation: 0,
+                        position: 'absolute',
+                        borderRadius: 100,
+                        marginBottom: -100,
+                        margin: 10
+
+                    },
+                    activeTintColor: '#D71920',
+                    inactiveTintColor: '#9B9B9B',
+                    headerShown: false,
+                    tabBarLabel: 'NewMiPerfilScreen',
                     tabBarIcon: ({ color }) => (
                         <FontAwesome name="home" size={24} color={color} />
                     ),

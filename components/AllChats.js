@@ -888,7 +888,8 @@ const styles = StyleSheet.create({
     imageChatPerfil: {
         height: 120,
         width: 120,
-        borderRadius: 100
+        borderRadius: 100,
+        objectFit: 'cover'
     },
     numeroChatPerfil: {
         fontSize: 19,

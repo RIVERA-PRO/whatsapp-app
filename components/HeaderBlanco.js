@@ -15,9 +15,12 @@ import Modal from 'react-native-modal';
 
 export default function Header() {
     const [isModalVisible, setModalVisible] = useState(false);
-
+    const [isModalVisible2, setModalVisible2] = useState(false);
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
+    };
+    const toggleModal2 = () => {
+        setModalVisible2(!isModalVisible2);
     };
     const navigation = useNavigation();
 
@@ -36,7 +39,14 @@ export default function Header() {
         navigation.navigate('NewEstadoSreen');
         setModalVisible(!isModalVisible);
     };
-
+    const goToNewMiEstado = () => {
+        navigation.navigate('NewMiEstado');
+        setModalVisible(!isModalVisible);
+    };
+    const goToNewMiPerfil = () => {
+        navigation.navigate('NewMiPerfilScreen');
+        setModalVisible2(!isModalVisible2);
+    };
     const openLinkedInProfile = () => {
         const linkedInURL = 'https://www.linkedin.com/in/juan-rivera-9ba866215/'; // Reemplaza con tu URL de LinkedIn
         Linking.openURL(linkedInURL);
@@ -64,14 +74,50 @@ export default function Header() {
                     <Feather name="camera" size={24} color="#fff" />
                     <Ionicons name="search-outline" size={24} color="#fff" />
 
-                    <Text style={styles.iconPuntos}>...</Text>
+                    <TouchableOpacity onPress={toggleModal2}>
+                        <Text style={styles.iconPuntos}>...</Text>
+                    </TouchableOpacity>
+
 
                 </View>
 
             </View>
 
 
+            <Modal
+                isVisible={isModalVisible2}
 
+                onSwipeComplete={toggleModal2}
+                onBackdropPress={toggleModal2}
+                style={styles.modal2}
+            >
+
+
+                <View style={styles.modalContent2} >
+
+                    <TouchableOpacity onPress={toggleModal2}>
+                        <Text style={styles.Text}>Privacidad de estado</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={goToNewChat} >
+
+                        <Text style={styles.Text}>Nuevo Chat</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={goToNewMiEstado} >
+
+                        <Text style={styles.Text}>Mi Estado</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={goToNewEstado} >
+
+                        <Text style={styles.Text}>Nuevo Estado de otro usuario</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={goToNewMiPerfil}>
+                        <Text style={styles.Text}>Ajustes</Text>
+                    </TouchableOpacity>
+
+                </View>
+
+            </Modal>
 
             <Modal
                 isVisible={isModalVisible}
@@ -97,9 +143,13 @@ export default function Header() {
                             <MaterialCommunityIcons name="chat" size={20} color='#128C7E' />
                             <Text style={styles.buttonText}>Nuevo Chat</Text>
                         </TouchableOpacity>
+                        <TouchableOpacity onPress={goToNewMiEstado} style={styles.btnNav}>
+                            <MaterialCommunityIcons name="chat" size={20} color='#128C7E' />
+                            <Text style={styles.buttonText}>Mi Estado</Text>
+                        </TouchableOpacity>
                         <TouchableOpacity onPress={goToNewEstado} style={styles.btnNav}>
                             <MaterialCommunityIcons name="chat" size={20} color='#128C7E' />
-                            <Text style={styles.buttonText}>Nuevo Estado</Text>
+                            <Text style={styles.buttonText}>Nuevo Estado de otro usuario</Text>
                         </TouchableOpacity>
 
                         <Text style={styles.text}>Contacto del desarrollador</Text>
@@ -203,6 +253,17 @@ const styles = StyleSheet.create({
         height: '100%',
 
     },
+    modalContent2: {
+        backgroundColor: '#fff',
+        borderRadius: 3,
+        overflow: 'hidden',
+        width: 220,
+        height: 215,
+        left: '35%',
+        top: 0,
+        padding: 4
+
+    },
     closeButton: {
         marginTop: 10,
         backgroundColor: '#ccc',
@@ -245,12 +306,21 @@ const styles = StyleSheet.create({
     modal: {
         margin: 0
     },
+    modal2: {
+        flex: 1,
+        justifyContent: 'flex-start',
+
+    },
     iconPuntos: {
         fontSize: 21,
         fontWeight: 'bold',
         transform: [{ rotate: '90deg' }],
         color: '#fff',
     },
+    Text: {
+        color: 'rgba(0, 0, 0, 0.6)',
+        padding: 10
+    }
 
 
 });

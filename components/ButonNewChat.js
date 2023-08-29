@@ -18,6 +18,10 @@ export default function ButonNewChat() {
         navigation.navigate('NewEstadoSreen');
         setShowButtons(!showButtons);
     };
+    const goToNewMiEstado = () => {
+        navigation.navigate('NewMiEstado');
+        setShowButtons(!showButtons);
+    };
     return (
         <View style={styles.container}>
             {showButtons && (
@@ -27,6 +31,9 @@ export default function ButonNewChat() {
                         <MaterialIcons name="chat" size={24} color="#fff" />
                     </TouchableHighlight>
                     <TouchableHighlight onPress={() => goToNewEstado()} underlayColor="transparent" style={styles.button}>
+                        <Feather name="camera" size={24} color="#fff" />
+                    </TouchableHighlight>
+                    <TouchableHighlight onPress={() => goToNewMiEstado()} underlayColor="transparent" style={styles.button}>
                         <Feather name="camera" size={24} color="#fff" />
                     </TouchableHighlight>
                 </View>

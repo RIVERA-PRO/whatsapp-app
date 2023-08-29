@@ -7,15 +7,14 @@ import {
     Text,
     Image
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+import ImagePicker from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Dialog } from 'react-native-popup-dialog';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { launchImageLibraryAsync } from 'expo-image-picker';
 
-
-export default function NewEstado() {
+export default function MiEstado() {
     const [fecha, setFecha] = useState('');
     const [image, setImage] = useState('');
     const [image2, setImage2] = useState('');
@@ -27,9 +26,10 @@ export default function NewEstado() {
 
     const selectImage = async () => {
         try {
-            const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            const result = await launchImageLibraryAsync({
+                mediaTypes: 'Images', // Puedes cambiar esto según tus necesidades
                 allowsEditing: true,
+                aspect: [4, 3],
                 quality: 1,
             });
 
@@ -41,31 +41,9 @@ export default function NewEstado() {
         }
     };
 
-    const selectImage2 = async () => {
-        try {
-            const result = await launchImageLibraryAsync({
-                mediaTypes: 'Images',
-                allowsEditing: true,
-                aspect: [4, 3],
-                quality: 1,
-            });
-
-            if (!result.cancelled) {
-                setImage2(result.uri); // Correct this line to setImage2 instead of setImage
-            }
-        } catch (error) {
-            console.error('Error selecting image:', error);
-        }
-    };
-
-
-
-
-
-
 
     const crearEstado = async () => {
-        if (fecha === '' || EstadoName === '') {
+        if (fecha === '') {
             console.log('los campos no pueden estar vacios');
             setShowAlertError(true);
             setTimeout(() => {
@@ -78,7 +56,7 @@ export default function NewEstado() {
             const chat = {
                 id: new Date().getTime().toString(),
                 fecha: fecha,
-                estadoName: EstadoName,
+                estadoName: "Mi estado",
                 img: image,
                 img2: image2,
                 estadoDescrip: EstadoDescripcion,
@@ -87,12 +65,12 @@ export default function NewEstado() {
 
             console.log(chat)
 
-            let chats = await AsyncStorage.getItem('estados');
+            let chats = await AsyncStorage.getItem('miestado');
             chats = chats ? JSON.parse(chats) : [];
 
             chats.push(chat);
 
-            await AsyncStorage.setItem('estados', JSON.stringify(chats));
+            await AsyncStorage.setItem('miestado', JSON.stringify(chats));
             setFecha('');
             setEstadoName('');
             setImage('');
@@ -128,20 +106,9 @@ export default function NewEstado() {
                 </TouchableOpacity>
             </View>
 
-            <View style={styles.inputsFlex}>
-                <TouchableOpacity onPress={selectImage2}>
-                    <Text style={styles.inputSelecImage}>Seleccionar Imagen del usuario                                </Text>
-                </TouchableOpacity>
-            </View>
 
-            <View style={styles.inputsFlex}>
-                <TextInput
-                    style={styles.input}
-                    value={EstadoName}
-                    placeholder="Nombre del usuario"
-                    onChangeText={setEstadoName}
-                />
-            </View>
+
+
 
             <View style={styles.inputsFlex}>
                 <TextInput

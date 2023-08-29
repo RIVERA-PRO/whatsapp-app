@@ -12,6 +12,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import EstadosAll from '../components/EstadosAll';
 import Grupo from '../components/Grupo';
 import EstadosCantidad from '../components/EstadosCantidad';
+import MiEstadoAll from '../components/MiEstadoAll'
 const windowWidth = Dimensions.get('window').width;
 
 export default function Home() {
@@ -111,6 +112,7 @@ export default function Home() {
                                 >
                                     Estados
                                 </Text>
+
                                 <EstadosCantidad />
                             </View>
 
@@ -157,7 +159,9 @@ export default function Home() {
 
 
                 <ScrollView style={styles.scrollView}>
+                    <MiEstadoAll />
                     <EstadosAll />
+
                     <View style={styles.espacio}>
 
                     </View>

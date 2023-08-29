@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Text, TextInput, Button, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, Text, TextInput, Modal, Image, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { EvilIcons } from '@expo/vector-icons';
@@ -8,6 +8,8 @@ import { Entypo } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ImageBackground } from 'react-native';
+import { PanGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
+import { Fontisto } from '@expo/vector-icons';
 export default function ChatMensaje() {
     const [messages, setMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState('');
@@ -146,6 +148,19 @@ export default function ChatMensaje() {
         }
     };
 
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalImageUri, setModalImageUri] = useState('');
+
+    const openImageModal = (imageUri) => {
+        setModalImageUri(imageUri);
+        setModalVisible(true);
+    };
+
+    const closeImageModal = () => {
+        setModalVisible(false);
+        setModalImageUri('');
+    };
+
     return (
 
 
@@ -217,15 +232,36 @@ export default function ChatMensaje() {
             <ScrollView style={styles.messageContainer}>
                 <ImageBackground source={{ uri: selectedImage }} style={styles.backgroundImage}>
                     {messages.map((message, index) => (
-                        <View key={index} style={message.sender === 'user' ? styles.userMessage : styles.otherMessage}>
-                            {message.image ? <Image source={{ uri: message.image }} style={styles.image} /> : null}
-                            <Text >{message.text}</Text>
+                        <View
+                            key={index}
+                            style={
+                                message.sender === 'user'
+                                    ? [styles.userMessage, { marginLeft: 20 }]
+                                    : [styles.otherMessage, { marginRight: 20 }]
+                            }
+                        >
+                            {message.image ? (
+                                <TouchableOpacity onPress={() => openImageModal(message.image)}>
+                                    <Image source={{ uri: message.image }} style={styles.image} />
+                                </TouchableOpacity>
+                            ) : null}
+                            <Text style={message.sender === 'user' ? styles.sentText : styles.receivedText}>{message.text}</Text>
+
                             {message.sender === 'user' && message.seen && (
                                 <Text style={styles.seenIcon}>✔</Text>
                             )}
                             <TextInput
-                                style={styles.timestampInput}
-                                value={message.editableTimestamp || new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                style={[
+                                    styles.timestampInput,
+                                    message.sender === 'user' ? styles.sentTimestamp : styles.receivedTimestamp
+                                ]}
+                                value={
+                                    message.editableTimestamp ||
+                                    new Date(message.timestamp).toLocaleTimeString([], {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                    })
+                                }
                                 onChangeText={(newTime) => {
                                     const updatedMessages = [...messages];
                                     updatedMessages[index].editableTimestamp = newTime;
@@ -245,10 +281,20 @@ export default function ChatMensaje() {
                                     }
                                 }}
                             />
+
                         </View>
                     ))}
 
+                    <Modal visible={modalVisible} transparent={true} onRequestClose={closeImageModal}>
+                        <View style={styles.modalContainer}>
 
+                            <TouchableOpacity style={styles.modalCloseButton} onPress={closeImageModal}>
+                                <AntDesign name="arrowleft" size={24} color="#fff" />
+                                <Fontisto name="share-a" size={20} color="#fff" />
+                            </TouchableOpacity>
+                            <Image source={{ uri: modalImageUri }} style={styles.modalImage} resizeMode="contain" />
+                        </View>
+                    </Modal>
 
                     <View style={styles.estpacio}>
 
@@ -274,30 +320,28 @@ const styles = StyleSheet.create({
 
     },
     userMessage: {
-
         alignSelf: 'flex-end',
         maxWidth: '75%',
-        padding: 8,
-        marginBottom: 8,
+        padding: 3,
+        marginBottom: 4,
         backgroundColor: '#dcf8c6',
         borderTopRightRadius: 2,
-        borderBottomRightRadius: 10,
-        borderBottomLeftRadius: 10,
-        borderTopLeftRadius: 10,
-        marginHorizontal: 8,
-        marginTop: 2
+        borderBottomRightRadius: 15,
+        borderBottomLeftRadius: 15,
+        borderTopLeftRadius: 13,
+        marginHorizontal: 10
     },
 
     otherMessage: {
         alignSelf: 'flex-start',
         maxWidth: '75%',
-        padding: 8,
-        marginBottom: 8,
+        padding: 3,
+        marginBottom: 4,
         backgroundColor: '#ffffff',
         marginTop: 2,
-        borderBottomRightRadius: 10,
-        borderBottomLeftRadius: 10,
-        borderTopRightRadius: 10,
+        borderBottomRightRadius: 15,
+        borderBottomLeftRadius: 15,
+        borderTopRightRadius: 13,
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
@@ -306,15 +350,26 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 2,
-        marginHorizontal: 8
+        marginHorizontal: 5
     },
+    sentText: {
+        marginLeft: 'auto',
+        marginRight: 70,
+        paddingLeft: 6,
+        fontSize: 15
+    },
+
+    receivedText: {
+        marginRight: 70,
+        paddingLeft: 6,
+        fontSize: 15
+    },
+
     image: {
         width: 200,
-        height: 200,
-        resizeMode: 'contain',
-
-
-        borderRadius: 8,
+        height: 220,
+        resizeMode: 'cover',
+        borderRadius: 10,
     },
     inputContainer: {
         flexDirection: 'row',
@@ -376,14 +431,51 @@ const styles = StyleSheet.create({
         height: 60
     },
     timestampInput: {
-        fontSize: 12,
+        fontSize: 11.2,
         color: 'rgba(0, 0, 0, 0.6)',
+        marginTop: -19,
+
+
+    },
+    sentTimestamp: {
+        marginLeft: 'auto',
+        marginRight: 10, // Adjust the margin as needed
+    },
+
+    receivedTimestamp: {
+        marginLeft: 'auto',
+        marginRight: 6, // Adjust the margin as needed
     },
     backgroundImage: {
-        height: '100%',
-        width: '100%',
-        minHeight: 900,
-        maxHeight: '100%',
 
+        minHeight: 700,
+
+        resizeMode: 'cover',
+        paddingTop: 10
+
+    },
+    modalContainer: {
+        flex: 1,
+
+        backgroundColor: '#000',
+    },
+    modalCloseButton: {
+        position: 'absolute',
+        top: 20,
+        right: 20,
+        zIndex: 1,
+    },
+    modalCloseText: {
+        color: 'white',
+        fontSize: 18,
+    },
+    modalImage: {
+        width: '100%',
+        height: '85%',
+    },
+    modalCloseButton: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 20
     }
 });
