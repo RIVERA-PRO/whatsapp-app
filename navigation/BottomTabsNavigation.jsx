@@ -6,6 +6,7 @@ import NewChatScreen from "../screens/NewChatScreen";
 import NewEstadoSreen from "../screens/NewEstadoSreen";
 import NewMiEstado from "../screens/NewMiEstado";
 import NewMiPerfilScreen from "../screens/NewMiPerfilScreen";
+import NewLlamadaSreen from "../screens/NewLlamadaSreen";
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -159,6 +160,30 @@ function BottomTabsNavigation() {
                     inactiveTintColor: '#9B9B9B',
                     headerShown: false,
                     tabBarLabel: 'NewMiPerfilScreen',
+                    tabBarIcon: ({ color }) => (
+                        <FontAwesome name="home" size={24} color={color} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="NewLlamadaSreen"
+                component={NewLlamadaSreen}
+                options={{
+                    tabBarButton: () => null, // Ocultar el botón del tab
+                    tabBarStyle: {
+                        backgroundColor: 'transparent',
+                        height: 56,
+                        elevation: 0,
+                        position: 'absolute',
+                        borderRadius: 100,
+                        marginBottom: -100,
+                        margin: 10
+
+                    },
+                    activeTintColor: '#D71920',
+                    inactiveTintColor: '#9B9B9B',
+                    headerShown: false,
+                    tabBarLabel: 'NewLlamadaSreen',
                     tabBarIcon: ({ color }) => (
                         <FontAwesome name="home" size={24} color={color} />
                     ),

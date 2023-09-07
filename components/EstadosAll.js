@@ -589,8 +589,9 @@ const styles = StyleSheet.create({
     },
     noResult: {
         color: '#000',
-        marginTop: 300,
-        textAlign: 'center'
+        marginTop: 200,
+        textAlign: 'center',
+        marginBottom: 300
     },
     recientes: {
         color: 'rgba(0, 0, 0, 0.6)',

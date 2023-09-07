@@ -13,6 +13,7 @@ import EstadosAll from '../components/EstadosAll';
 import Grupo from '../components/Grupo';
 import EstadosCantidad from '../components/EstadosCantidad';
 import MiEstadoAll from '../components/MiEstadoAll'
+import ButonLlamadaCreate from '../components/ButonLlamadaCreate';
 const windowWidth = Dimensions.get('window').width;
 
 export default function Home() {
@@ -86,7 +87,7 @@ export default function Home() {
                                         selectedComponent === 'AllChats' ? styles.activeButtonText : null,
                                     ]}
                                 >
-                                    Ch...
+                                    Chats
                                 </Text>
 
                                 <ChatCantidad />
@@ -167,6 +168,7 @@ export default function Home() {
                     </View>
                 </ScrollView>
                 <ScrollView style={styles.scrollView}>
+                    <ButonLlamadaCreate />
                     <LlamadasAll />
                     <View style={styles.espacio}>
 
@@ -188,6 +190,7 @@ export default function Home() {
 const styles = StyleSheet.create({
     contenedor: {
         backgroundColor: '#fff',
+        height: '100%'
 
     },
     header: {
@@ -244,7 +247,7 @@ const styles = StyleSheet.create({
     deflex: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6
+
     },
     espacio: {
         height: 100

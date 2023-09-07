@@ -193,23 +193,9 @@ export default function PhotoPerfil() {
 
 
 
-                <TouchableOpacity
+                <View
                     key={chat.id}
-                    onPress={() => {
 
-                        openEditModal(
-                            chat.id,
-                            chat.numero,
-                            chat.chat,
-                            chat.chat1,
-                            chat.chat2,
-                            chat.num,
-                            chat.estate,
-                            chat.img // Make sure this is correct
-                        )
-
-                    }
-                    }
                     style={styles.deFlexPerfil}
                 >
 
@@ -223,7 +209,7 @@ export default function PhotoPerfil() {
                     </View>
 
 
-                </TouchableOpacity>
+                </View>
             ))}
         </>
 

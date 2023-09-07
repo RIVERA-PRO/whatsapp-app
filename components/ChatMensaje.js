@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, ScrollView, Text, TextInput, Modal, Image, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
@@ -10,13 +10,19 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { ImageBackground } from 'react-native';
 import { PanGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
 import { Fontisto } from '@expo/vector-icons';
+import * as DocumentPicker from 'expo-document-picker';
+import { FontAwesome } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+
 export default function ChatMensaje() {
     const [messages, setMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState('');
     const [receivedMessage, setReceivedMessage] = useState('');
     const [selectedImage, setSelectedImage] = useState(null);
-
+    const [selectedImage2, setSelectedImage2] = useState(null);
     const [showInput, setShowInput] = useState(false);
+    const scrollViewRef = useRef();
 
     useEffect(() => {
         loadMessages();
@@ -27,16 +33,17 @@ export default function ChatMensaje() {
         try {
             const storedMessages = await AsyncStorage.getItem('chatMessages');
             if (storedMessages) {
-                setMessages(JSON.parse(storedMessages));
+                const parsedMessages = JSON.parse(storedMessages);
+                setMessages(parsedMessages);
             }
         } catch (error) {
             console.error('Error loading messages:', error);
         }
     };
 
-    const saveMessages = async () => {
+    const saveMessages = async (newMessages) => {
         try {
-            await AsyncStorage.setItem('chatMessages', JSON.stringify(messages));
+            await AsyncStorage.setItem('chatMessages', JSON.stringify(newMessages));
             console.log('Messages saved successfully');
         } catch (error) {
             console.error('Error saving messages:', error);
@@ -51,9 +58,10 @@ export default function ChatMensaje() {
                 image: null,
                 timestamp: new Date().toISOString(),
             };
-            setMessages([...messages, newMessage]);
+            const newMessages = [...messages, newMessage];
+            setMessages(newMessages);
             setInputMessage('');
-            saveMessages();
+            saveMessages(newMessages);
         }
     };
 
@@ -65,38 +73,25 @@ export default function ChatMensaje() {
                 image: null,
                 timestamp: new Date().toISOString(),
             };
-            setMessages([...messages, newMessage]);
+            const newMessages = [...messages, newMessage];
+            setMessages(newMessages);
             setReceivedMessage('');
-            saveMessages();
+            saveMessages(newMessages);
         }
     };
-    const handleReceivedImage = async () => {
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            quality: 1,
-        });
 
-        const newMessage = {
-            text: '',
-            sender: 'other',
-            image: result.cancelled ? null : result.uri,
-        };
-
-        setMessages([...messages, newMessage]);
-        saveMessages();
-    };
 
     const handleClearAllMessages = async () => {
         try {
             // Clear messages from state
             setMessages([]);
-
+            setSelectedImage('')
             // Clear messages from storage
             await AsyncStorage.removeItem('chatMessages');
-
+            await AsyncStorage.removeItem('selectedImage');
             // Reload the component to reflect changes
             loadMessages();
+            loadBackgroundImage()
         } catch (error) {
             console.error('Error clearing messages:', error);
         }
@@ -111,11 +106,56 @@ export default function ChatMensaje() {
 
         if (!result.cancelled) {
             const newMessage = { text: '', sender: 'user', image: result.uri };
-            setMessages([...messages, newMessage]);
-            saveMessages();
+            const newMessages = [...messages, newMessage];
+            setMessages(newMessages);
+            saveMessages(newMessages);
         }
     };
 
+    const handleReceivedImage = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            quality: 1,
+        });
+
+        if (!result.cancelled) {
+            const newMessage = { text: '', sender: 'other', image: result.uri };
+            const newMessages = [...messages, newMessage];
+            setMessages(newMessages);
+            saveMessages(newMessages);
+        }
+    };
+
+    const handleImagePick2 = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            quality: 1,
+        });
+
+        if (!result.cancelled) {
+            const newMessage = { text: '', sender: 'user', image: '', image2: result.uri };
+            const newMessages = [...messages, newMessage];
+            setMessages(newMessages);
+            saveMessages(newMessages);
+        }
+    };
+
+    const handleReceivedImage2 = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            quality: 1,
+        });
+
+        if (!result.cancelled) {
+            const newMessage = { text: '', sender: 'other', image: '', image2: result.uri };
+            const newMessages = [...messages, newMessage];
+            setMessages(newMessages);
+            saveMessages(newMessages);
+        }
+    };
     const mostrarInputs = () => {
         setShowInput(!showInput)
     }
@@ -180,8 +220,11 @@ export default function ChatMensaje() {
                         value={inputMessage}
                         onChangeText={setInputMessage}
                     />
-                    <TouchableOpacity onPress={handleImagePick} >
+                    <TouchableOpacity onPress={handleImagePick2} >
                         <EvilIcons name="paperclip" size={24} color='rgba(0, 0, 0, 0.4)' />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={handleImagePick} >
+                        <FontAwesome name="camera" size={20} color='rgba(0, 0, 0, 0.4)' />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={mostrarInputs} >
                         <AntDesign name="pluscircleo" size={20} color='rgba(0, 0, 0, 0.3)' />
@@ -201,7 +244,9 @@ export default function ChatMensaje() {
                 <View style={styles.inputContainer}>
 
                     <View style={styles.inpuFflex}>
-                        <Entypo name="emoji-happy" size={20} color='rgba(0, 0, 0, 0.3)' />
+                        <TouchableOpacity onPress={handleBackgroundImagePick} style={styles.backgroundButton}>
+                            <Entypo name="emoji-happy" size={20} color='rgba(0, 0, 0, 0.3)' />
+                        </TouchableOpacity>
 
 
 
@@ -211,9 +256,11 @@ export default function ChatMensaje() {
                             value={receivedMessage}
                             onChangeText={setReceivedMessage}
                         />
-
-                        <TouchableOpacity onPress={handleReceivedImage} >
+                        <TouchableOpacity onPress={handleReceivedImage2} >
                             <EvilIcons name="paperclip" size={24} color='rgba(0, 0, 0, 0.4)' />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={handleReceivedImage} >
+                            <FontAwesome name="camera" size={20} color='rgba(0, 0, 0, 0.4)' />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={mostrarInputs} >
                             <AntDesign name="pluscircleo" size={20} color='rgba(0, 0, 0, 0.3)' />
@@ -229,7 +276,18 @@ export default function ChatMensaje() {
                 </View>
             )}
 
-            <ScrollView style={styles.messageContainer}>
+            <ScrollView
+                style={styles.messageContainer}
+                ref={scrollViewRef}
+                onContentSizeChange={() => {
+                    if (messages.length > 10) {
+                        scrollViewRef.current.scrollToEnd({ animated: true });
+                    }
+                }}
+            >
+
+
+
                 <ImageBackground source={{ uri: selectedImage }} style={styles.backgroundImage}>
                     {messages.map((message, index) => (
                         <View
@@ -245,64 +303,87 @@ export default function ChatMensaje() {
                                     <Image source={{ uri: message.image }} style={styles.image} />
                                 </TouchableOpacity>
                             ) : null}
-                            <Text style={message.sender === 'user' ? styles.sentText : styles.receivedText}>{message.text}</Text>
 
-                            {message.sender === 'user' && message.seen && (
-                                <Text style={styles.seenIcon}>✔</Text>
+                            {message.image2 ? (
+                                <TouchableOpacity onPress={() => openImageModal(message.image2)} style={styles.deFlex2}>
+                                    <MaterialCommunityIcons name="progress-alert" size={20} color="rgba(0, 0, 0, 0.6)" />
+                                    <Text style={message.sender === 'user' ? styles.sentimage2 : styles.receivedimage2}>
+                                        Foto
+                                    </Text>
+                                </TouchableOpacity>
+                            ) : null}
+                            {message.text !== '' && (
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={message.sender === 'user' ? styles.sentText : styles.receivedText}>
+                                        {message.text}
+                                    </Text>
+
+                                </View>
                             )}
-                            <TextInput
-                                style={[
-                                    styles.timestampInput,
-                                    message.sender === 'user' ? styles.sentTimestamp : styles.receivedTimestamp
-                                ]}
-                                value={
-                                    message.editableTimestamp ||
-                                    new Date(message.timestamp).toLocaleTimeString([], {
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                    })
-                                }
-                                onChangeText={(newTime) => {
-                                    const updatedMessages = [...messages];
-                                    updatedMessages[index].editableTimestamp = newTime;
-                                    setMessages(updatedMessages);
-                                }}
-                                onBlur={() => {
-                                    if (message.editableTimestamp) {
-                                        const updatedMessages = [...messages];
-                                        const newTimestamp = new Date(message.editableTimestamp);
 
-                                        if (!isNaN(newTimestamp)) {
-                                            updatedMessages[index].timestamp = newTimestamp.toISOString();
-                                            delete updatedMessages[index].editableTimestamp;
-                                            setMessages(updatedMessages);
-                                            saveMessages();
+                            {message.text !== '' && (
+                                <View style={styles.deFlex}>
+                                    <TextInput
+                                        style={[
+                                            styles.timestampInput,
+                                            message.sender === 'user' ? styles.sentTimestamp : styles.receivedTimestamp
+                                        ]}
+                                        value={
+                                            message.editableTimestamp ||
+                                            new Date(message.timestamp).toLocaleTimeString([], {
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                            })
                                         }
-                                    }
-                                }}
-                            />
+                                        onChangeText={(newTime) => {
+                                            const updatedMessages = [...messages];
+                                            updatedMessages[index].editableTimestamp = newTime;
+                                            setMessages(updatedMessages);
+                                        }}
+                                        onBlur={() => {
+                                            if (message.editableTimestamp) {
+                                                const updatedMessages = [...messages];
+                                                const newTimestamp = new Date(message.editableTimestamp);
+
+                                                if (!isNaN(newTimestamp)) {
+                                                    updatedMessages[index].timestamp = newTimestamp.toISOString();
+                                                    delete updatedMessages[index].editableTimestamp;
+                                                    setMessages(updatedMessages);
+                                                    saveMessages();
+                                                }
+                                            }
+                                        }}
+                                    />
+                                    {message.sender === 'user' && (
+                                        <Ionicons style={styles.icon} name="md-checkmark-done-sharp" size={15} color="grey" />
+                                    )}
+                                </View>
+
+                            )}
+
+
 
                         </View>
                     ))}
 
                     <Modal visible={modalVisible} transparent={true} onRequestClose={closeImageModal}>
                         <View style={styles.modalContainer}>
-
                             <TouchableOpacity style={styles.modalCloseButton} onPress={closeImageModal}>
                                 <AntDesign name="arrowleft" size={24} color="#fff" />
-                                <Fontisto name="share-a" size={20} color="#fff" />
+                                <View style={styles.deFlex3}>
+                                    <Entypo name="star-outlined" size={22} color="#fff" />
+                                    <Fontisto name="share-a" size={18} color="#fff" />
+                                    <Text style={styles.iconPuntos}>...</Text>
+                                </View>
                             </TouchableOpacity>
                             <Image source={{ uri: modalImageUri }} style={styles.modalImage} resizeMode="contain" />
                         </View>
                     </Modal>
-
-                    <View style={styles.estpacio}>
-
-                    </View>
+                    <View style={styles.estpacio}></View>
                 </ImageBackground>
             </ScrollView>
 
-        </View>
+        </View >
 
     );
 }
@@ -354,7 +435,7 @@ const styles = StyleSheet.create({
     },
     sentText: {
         marginLeft: 'auto',
-        marginRight: 70,
+        marginRight: 83,
         paddingLeft: 6,
         fontSize: 15
     },
@@ -374,13 +455,12 @@ const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-
-
         gap: 7,
         top: '92%',
         position: 'absolute',
         zIndex: 5,
-        marginHorizontal: 8
+        marginHorizontal: 10,
+        justifyContent: 'space-between'
 
     },
     input: {
@@ -396,10 +476,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff',
         flexDirection: 'row',
         alignItems: 'center',
-        width: '86%',
+        width: '87%',
         borderRadius: 100,
         paddingHorizontal: 10,
         gap: 8,
+
 
 
     },
@@ -439,7 +520,7 @@ const styles = StyleSheet.create({
     },
     sentTimestamp: {
         marginLeft: 'auto',
-        marginRight: 10, // Adjust the margin as needed
+        marginRight: 0, // Adjust the margin as needed
     },
 
     receivedTimestamp: {
@@ -448,10 +529,12 @@ const styles = StyleSheet.create({
     },
     backgroundImage: {
 
-        minHeight: 700,
+        minHeight: 750,
 
         resizeMode: 'cover',
-        paddingTop: 10
+        paddingTop: 10,
+
+
 
     },
     modalContainer: {
@@ -476,6 +559,44 @@ const styles = StyleSheet.create({
     modalCloseButton: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        padding: 20
-    }
+        padding: 20,
+        alignItems: 'center',
+    },
+    icon: {
+        marginTop: -19,
+    },
+    deFlex: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        marginRight: 5
+    },
+    deFlex2: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 3,
+        padding: 5,
+    },
+    deFlex3: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 20,
+
+    },
+    receivedimage2: {
+
+        marginRight: 15,
+        color: 'rgba(0, 0, 0, 0.6)',
+    },
+    sentimage2: {
+        marginRight: 15,
+        color: 'rgba(0, 0, 0, 0.6)',
+    },
+    iconPuntos: {
+        fontSize: 21,
+        fontWeight: 'bold',
+        transform: [{ rotate: '90deg' }],
+        color: '#fff',
+    },
 });

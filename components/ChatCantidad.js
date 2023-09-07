@@ -61,11 +61,17 @@ export default function ChatCantidad() {
             console.log('Error fetching chats:', error);
         }
     };
-    return (
-        <View style={styles.cantidadNum}>
-            <Text style={styles.text}>{String(chats.length).slice(0, 5)}</Text>
+    if (chats.length > 0) {
+        return (
+            <View style={styles.cantidadNum}>
+                <Text style={styles.text}>{String(chats.length).slice(0, 5)}</Text>
+            </View>
+        );
+    } else {
+        <View style={styles.cantidadNum2}>
+            <Text style={styles.text2}>asdasd</Text>
         </View>
-    )
+    }
 
 }
 
@@ -76,6 +82,18 @@ const styles = StyleSheet.create({
 
     },
     text: {
+        paddingHorizontal: 7,
+        paddingVertical: 2,
+        fontSize: 12,
+        color: '#128C7E'
+    },
+    cantidadNum2: {
+        width: 100,
+        backgroundColor: '#fff',
+        borderRadius: 100
+    },
+    text2: {
+        width: 100,
         paddingHorizontal: 7,
         paddingVertical: 2,
         fontSize: 12,

@@ -144,7 +144,7 @@ export default function AllChats() {
 
     if (chats.length === 0) {
         return (
-            <Text style={styles.noChats}>No hay chats</Text>
+            <Text style={styles.noResult}>No hay chats</Text>
         );
     }
 
@@ -485,7 +485,6 @@ export default function AllChats() {
                 animationType="slide"
                 onRequestClose={() => setModalVisible(false)}
             >
-
                 <ScrollView style={styles.modalContainer2}>
                     <View style={styles.headerPerfil}>
                         <View style={styles.deFlex2}>
@@ -898,5 +897,12 @@ const styles = StyleSheet.create({
     nombreChatPerfil: {
         fontSize: 20,
         color: 'rgba(0, 0, 0, 0.9)',
-    }
+    },
+    noResult: {
+        color: '#000',
+        marginTop: 300,
+        textAlign: 'center',
+        marginBottom: 300
+
+    },
 })
